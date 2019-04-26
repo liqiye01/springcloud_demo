@@ -4,7 +4,7 @@ server:
 ###注册中心的服务名（注册中心集群的时候必须要配置，并且每一个注册中心的服务名都要一样）
 spring:
   application:
-    name: api-eureka
+    name: eureka-server
 eureka:
   instance:
     ###注册中心ip地址
