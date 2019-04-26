@@ -1,0 +1,24 @@
+###会员项目的端口号
+server:
+  port: 8764
+###服务别名（服务注册到注册中心的名字）注意：别名千万不能包含下划线，不然服务调用时，使用别名会报错找不到url
+spring:
+  application:
+    name: api-member
+eureka:
+  client:
+    service-url:
+      ###当前会员服务注册到的指定注册中心rureka（如果是集群的注册中心，用逗号分隔开）
+      defaultZone: http://localhost:8761/eureka/,http://localhost:9761/eureka/
+    ###需要将我的服务注册到rureka上
+    register-with-eureka: true
+    ###需要检索服务
+    fetch-registry: true
+  ###心跳检测与续约时间   测试时将时间设置小一点，保证服务关闭后注册中心能及时将其剔除
+  instance:
+    ###eureka客户端向服务短发送心跳的时间间隔，单位秒
+    lease-renewal-interval-in-seconds: 1
+    ###rureka客户端接收到最后一次心跳之后等待的时间上限，单位秒
+    lease-expiration-duration-in-seconds: 2
+
+

@@ -1,0 +1,23 @@
+###eureka注册中心服务的端口号
+server:
+  port: 9761
+###注册中心的服务名（注册中心集群的时候必须要配置，并且每一个注册中心的服务名都要一样）
+spring:
+  application:
+    name: api-eureka
+eureka:
+  instance:
+    ###注册中心ip地址
+    hostname: localhost
+  client:
+    ###因为自己是注册中心，不需要去检索服务信息（集群的时候需要为true）
+    registerWithEureka: true
+    ###因为自己是注册中心，是否需要将自己注册给自己的注册中心（集群的时候需要为true）
+    fetchRegistry: true
+    serviceUrl:
+      ###注册中心的地址（如果是集群，ip和端口改成别的注册中心的，如果有多台，用逗号分隔开）
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+  server:
+    ###测试环境关闭自我保护机制，保证不可用服务及时剔除，两秒剔除
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 2000
