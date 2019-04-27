@@ -1,30 +1,45 @@
-###\u7F51\u5173\u7684\u7AEF\u53E3\u53F7
+###网关的端口号
 server:
   port: 80
-###\u670D\u52A1\u522B\u540D\uFF08\u670D\u52A1\u6CE8\u518C\u5230\u6CE8\u518C\u4E2D\u5FC3\u7684\u540D\u5B57\uFF09
+###服务别名（服务注册到注册中心的名字）
 spring:
   application:
     name: zuul-server
+  ###如果用到了分布式配置中心，该项目会从配置中心读取文件名为zuul-server-sit.xxx 的配置文件信息，没有找到该项目启动报错
+  ###注意：如果你没有用到分布式配置中心，要把下面的注释掉，不然没法启动该项目
+  cloud:
+    config:
+      profile: sit   #配置文件中间的参数
+      discovery:
+        service-id: config-server  #就是发布配置中心那个项目指定的别名
+        enabled: true   #开启读取权限
+###开启监控中心所有端点（开启后ConfigClient可以实时手动读取ConfigServer里更新后的配置文件，要手动用postman用post请求http://ip:该项目端口/actuator/refresh）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 eureka:
   client:
     service-url:
-      ###\u5F53\u524D\u7F51\u5173\u670D\u52A1\u6CE8\u518C\u5230\u7684\u6307\u5B9A\u6CE8\u518C\u4E2D\u5FC3rureka\uFF08\u5982\u679C\u662F\u96C6\u7FA4\u7684\u6CE8\u518C\u4E2D\u5FC3\uFF0C\u7528\u9017\u53F7\u5206\u9694\u5F00\uFF09
+      ###当前网关服务注册到的指定注册中心rureka（如果是集群的注册中心，用逗号分隔开）
       defaultZone: http://localhost:8761/eureka/,http://localhost:9761/eureka/
-    ###\u9700\u8981\u5C06\u6211\u7684\u670D\u52A1\u6CE8\u518C\u5230rureka\u4E0A
+    ###需要将我的服务注册到rureka上
     register-with-eureka: true
-    ###\u9700\u8981\u68C0\u7D22\u670D\u52A1
+    ###需要检索服务
     fetch-registry: true
-###\u7F51\u5173\u5B9E\u73B0\u8DEF\u7531\u8BF7\u6C42\u5206\u53D1\uFF08zuul\u5DF2\u96C6\u6210ribbon\u548Chystrix\uFF09
-###zuul\u5728\u4F7F\u7528serviceId\u6620\u5C04\u7684\u65B9\u6CD5\u8DEF\u7531\u8F6C\u53D1\u7684\u65F6\u5019,\u4F1A\u4F7F\u7528Ribbon+Hystrix\uFF0C\u6700\u597D\u6307\u5B9A\u4E0Bribbon\u548Chystrix\u7684\u8D85\u65F6\u65F6\u95F4
-zuul:
-  routes:
-    api-a:
-      path: /api-member/*
-      serviceId: api-member
-    api-b:
-      path: /api-order/*
-      serviceId: api-order
-###(false)\u7981\u6B62\u670D\u52A1\u8D85\u65F6\u65F6\u95F4\uFF08\u6B63\u5F0F\u4E0A\u7EBF\u4E0D\u8981\u7981\u6B62\uFF0C\u8BBE\u7F6E\u8D85\u65F6\u65F6\u95F4\uFF09
+###网关实现路由请求分发（zuul已集成ribbon和hystrix）
+###zuul在使用serviceId映射的方法路由转发的时候,会使用Ribbon+Hystrix，最好指定下ribbon和hystrix的超时时间
+#zuul:
+#  routes:
+#    api-a:
+#      path: /api-member/*
+#      serviceId: api-member
+#    api-b:
+#      path: /api-order/*
+#      serviceId: api-order
+###(false)禁止服务超时时间（正式上线不要禁止，设置超时时间）
 hystrix:
   command:
     default:
@@ -33,10 +48,11 @@ hystrix:
           enabled: true
         isolation:
           thread:
-            ###hystrix\u7684\u8D85\u65F6\u65F6\u95F4
+            ###hystrix的超时时间
             timeoutInMilliseconds: 4000
-###ribbon\u7684\u8D85\u65F6\u65F6\u95F4\uFF08\u8FD9\u4E2A\u65F6\u95F4\u4E00\u822C\u6BD4hystrix\u7684\u77ED\uFF0C\u56E0\u4E3A\u5B83\u6709\u91CD\u8BD5\uFF09\u4E0D\u8BBE\u7F6E\u8FD9\u4E2Afeign\u8C03\u7528\u670D\u52A1\u8D85\u8FC7\u4E00\u79D2\u5C31\u4F1A\u670D\u52A1\u964D\u7EA7
+###ribbon的超时时间（这个时间一般比hystrix的短，因为它有重试）不设置这个feign调用服务超过一秒就会服务降级
 ribbon:
   ReadTimeout: 3000
   ConnectTimeout: 3000
+
 

@@ -5,7 +5,7 @@ server:
 spring:
   application:
     name: api-order
-  ###如果用到了分布式配置中心，该项目会从配置中心读取文件名为api-order-sit.properties的配置文件信息，没有找到该项目启动报错
+  ###如果用到了分布式配置中心，该项目会从配置中心读取文件名为api-order-sit.xxx 的配置文件信息，没有找到该项目启动报错
   ###注意：如果你没有用到分布式配置中心，要把下面的注释掉，不然没法启动该项目
   cloud:
     config:
@@ -13,7 +13,7 @@ spring:
       discovery:
         service-id: config-server  #就是发布配置中心那个项目指定的别名
         enabled: true   #开启读取权限
-###开启所有端点（开启后ConfigClient可以实时手动读取ConfigServer里更新后的配置文件，要手动用postman用post请求http://ip:该项目端口/actuator/refresh）
+###开启监控中心所有端点（开启后ConfigClient可以实时手动读取ConfigServer里更新后的配置文件，要手动用postman用post请求http://ip:该项目端口/actuator/refresh）
 management:
   endpoints:
     web:
